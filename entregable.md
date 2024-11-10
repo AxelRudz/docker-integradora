@@ -121,10 +121,12 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 - Escriba los comandos utilizados para realizar lo solicitado con la explicación correspondiente.
 
     ```bash
-    # Inserte los comandos utilizados
+    docker volume create todo_data # Se puede omitir este paso, el volumen se creara automaticamente en el siguiente comando
+    docker run --rm -p 4200:3000 -v todo_data:/etc/todos axelrudz/app:v1.1-alpine
     ```
 
 - Decida que tipo de persistencia es la adecuada para la app.
+    - _Considero conveniente usar un volúmen. Son más fáciles de gestionar, más seguros y más portables. Las ventajas del bind mount no se aprovecharían, ya que solo queremos guardar datos simples que perfectamente podrían estar aislados._
 
 > [!TIP]
 > Repase [volúmenes y persistencia](https://docker.idepba.com.ar/clase4.html#/volumenes) de datos.
@@ -136,17 +138,18 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 - [Crear una red](https://docker.idepba.com.ar/clase4.html#/network_create) para conexión entre los contenedores que servirá también para conectar a la aplicación.
 
     ```bash
-    # Inserte el comando utilizado
+    docker network create mi_red # Por defecto crea una red de tipo bridge
     ```
 - [Crear un nuevo volumen](https://docker.idepba.com.ar/clase4.html#/volume_create) para persistir los datos de la base MySQL. El path donde se almacenan los datos en el contenedor MySQL es `/var/lib/mysql`.
     
     ```bash
-    # Comando para crear nuevo volumen utilizado
+    docker volume create mysql_data
     ```
 - Iniciar el contenedor de la aplicación utilizando el comando `docker run` enviando las variables de entornos necesarias para la conexión con la base de datos.
 
     ```bash
-    # Inserte el comando necesario para realizar lo solicitado
+    docker run --name mysql-container -v mysql_data:/var/lib/mysql --network mi_red -e MYSQL_ROOT_PASSWORD=mipassword -e MYSQL_DATABASE=todo mysql:8.0
+    docker run --name todo-container -v todo_data:/etc/todos --network mi_red -e MYSQL_HOST=mysql-container -e MYSQL_USER=root -e MYSQL_PASSWORD=mipassword -e MYSQL_DB=todo -p 4200:3000 axelrudz/app:v1.1-alpine
     ```
 
 > [!TIP]
