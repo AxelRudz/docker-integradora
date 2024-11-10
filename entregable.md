@@ -163,7 +163,50 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 En la carpeta raíz del proyecto, cree un archivo de docker compose `compose.yml` o `docker-compose.yml`. Adicionalmente pégue el contenido del archivo `compose` en este lugar:
 
 ```compose
-# Copie aquí el contenido del archivo compose.
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: mipassword
+      MYSQL_DATABASE: todo
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mi-red
+    expose:
+      - "3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+      start_interval: 5s
+
+
+  app:
+    image: axelrudz/app:v1.1-alpine
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: mipassword
+      MYSQL_DB: todo
+    volumes:
+      - todo_data:/etc/todos
+    networks:
+      - mi-red
+    ports:
+      - "4200:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  todo_data:
+
+networks:
+  mi-red:
 ```
 
 > [!IMPORTANT]  
