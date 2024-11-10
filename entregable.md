@@ -11,16 +11,19 @@
 - Ejecute el comando correspondiente para buildear la imágen. Elija un nombre de imágen y un tag acorde. 
 
     ```bash
-    # Inserte aquí el comando utilizado para buildear la imágen
+    docker build -t app:v1.0-alpine app/.
     ```
 - Muestre cuánto espacio ocupa la imaǵen una vez creada.
 
     ```bash
-    # Inserte aquí el comando utilizado para ver el espacio que ocupa
+    docker images app:v1.0-alpine
     ```
 - ¿Puede hacer algo para optimizar o mejorar la imágen?. Describa qué modificaciones puede hacer para optimizar la imágen.
 
-_(Describa que modificaciones podría hacer para mejorar la imágen de ser posible)_
+#### _Cambios para optimizar la imagen_:
+- Usar como imagen base **node:alpine** en vez de solo **alpine**.
+- Concatenar las dos instrucciones **RUN**. De esa forma tendremos solo una capa en vez de dos.
+- Reoganizar las lineas del docker file para aprovechar la cache.
 
 
 
@@ -31,18 +34,24 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 
 - Ejecute un comando para poder correr la aplicación.
     ```bash
-    # Inserte aquí el comando para ejecutar la aplicación
+    docker run --rm -p 4200:3000 app:v1.0-alpine
     ```
 - Explique el comando y cada parámetro enviado.
-
-    _(Realice una explicación de los parámetros aquí)_
+    - **Docker run**: crea y ejecuta un contenedor según la imagen proporcionada.
+    - **--rm**: indica que debe borrar el contenedor al detenerse.
+    - **-p 4200:3000**: indica que debe mapear el puerto 4200 del host con el 3000 del contenedor (donde está escuchando la app).
+    
 - Muestre una captura de pantalla o un copy-paste del contenedor corriendo.
 
-    _(Inserte aquí la captura de pantalla o los la salida de la shell con el contenedor corriendo)_
+    ```
+    PS C:\Proyectos\docker-integradora> docker run --rm -p 4200:3000 app:v1.0-alpine
+    Using sqlite database at /etc/todos/todo.db
+    Listening on port 3000
+    ```
 
 - Adjunte una captura de pantalla con la aplicación funcionando con la URL utilizada para acceder.
 
-    ![Screenshot](./imgs/img_placeholder.png)
+    ![Screenshot](./imgs/url-app-corriendo.png)
 
 
 ## Parte 2 - Actualizar aplicación (imágen)
@@ -52,12 +61,13 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 - Ejecutemos los comando necesarios para que la aplicación tome los cambios. Realice un etiquetado (tag) coherente respecto a los cambios en la imágen
     
     ```bash
-    # Inserte aquí los comando necesarios
+    docker build -t app:v1.1-alpine app/.  # Cambio de v1.0 a v1.1
+    docker run --rm -p 4200:3000 app:v1.1-alpine
     ```
 
 - Mostrar captura de pantalla con la app corriendo con las modificaciones realizadas.
 
-    ![Screenshot](./imgs/img_placeholder.png)
+    ![Screenshot](./imgs/url-app-corriendo-2.png)
 
 > La actualizaciones realizadas, dejan a la primera versión obsoleta
 
@@ -66,13 +76,15 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 - Elimine la imágen y el contenedor hecho en el punto anterior
 
     ```bash
-    # Inserte los comando utilizados para eliminar la imágen
+    docker rm ${NOMBRE_DEL_CONTENEDOR} # No es necesario debido a que usé el flag --rm anteriormente.
+    docker image rm app:v1.0-alpine
     ```
 
 - Liste las imágenes y contenedores para ver que ya no existen.
 
     ```bash
-    # Inserte comando para realizar lo solicitado
+    docker ps -a # Para ver todos los contenedores
+    docker image ls -a # Para listar todas las imagenes
     ```
 
 
